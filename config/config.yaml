@@ -1,0 +1,11 @@
+database:
+  host_env_var: "DATABRICKS_HOST"
+  http_path_env_var: "DATABRICKS_HTTP_PATH"
+  token_env_var: "DATABRICKS_TOKEN"
+  catalog_env_var: "DATABRICKS_CATALOG"
+  schema_env_var: "DATABRICKS_SCHEMA"
+
+raw_data:
+  customers_csv: "data/raw/customers.csv"
+  orders_csv: "data/raw/orders.csv"
+  orders_invalid_csv: "data/raw/orders_invalid.csv"
