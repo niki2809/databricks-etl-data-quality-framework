@@ -29,3 +29,18 @@ def step_pipeline_no_errors(context):
             f"dbt {phase} failed (exit {result.returncode}).\n"
             f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
         )
+
+_PIPELINE_RESULT = None
+
+
+@given("the ETL pipeline has been executed")
+def step_given_pipeline_executed(context):
+    global _PIPELINE_RESULT
+    if _PIPELINE_RESULT is None:
+        _PIPELINE_RESULT = dbt_runner.run_full_pipeline()
+    context.pipeline_result = _PIPELINE_RESULT
+    for phase, result in context.pipeline_result.items():
+        assert result.returncode == 0, (
+            f"dbt {phase} failed (exit {result.returncode}).\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
