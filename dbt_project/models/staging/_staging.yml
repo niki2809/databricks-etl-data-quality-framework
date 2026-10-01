@@ -1,0 +1,33 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: "{{ env_var('DATABRICKS_SCHEMA', 'dq_framework') }}"
+    tables:
+      - name: raw_customers
+      - name: raw_orders
+
+models:
+  - name: stg_customers
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
+      - name: email
+        tests: [not_null]
+
+  - name: stg_orders
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_customers')
+                field: customer_id
+      - name: order_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['COMPLETED', 'CANCELLED', 'PENDING']

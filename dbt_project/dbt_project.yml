@@ -1,0 +1,26 @@
+name: 'etl_dq'
+version: '1.0.0'
+config-version: 2
+profile: 'etl_dq'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  etl_dq:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
+      +file_format: delta
+
+seeds:
+  etl_dq:
+    +column_types:
+      customer_id: int
+      order_id: int
+      order_amount: double
+      
