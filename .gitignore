@@ -1,0 +1,10 @@
+.venv/
+.env
+__pycache__/
+*.pyc
+.behave/
+dbt_project/target/
+dbt_project/logs/
+dbt_project/dbt_packages/
+dbt_project/.user.yml
+reports/behave/*.html
