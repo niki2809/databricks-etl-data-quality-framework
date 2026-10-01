@@ -9,3 +9,11 @@ raw_data:
   customers_csv: "data/raw/customers.csv"
   orders_csv: "data/raw/orders.csv"
   orders_invalid_csv: "data/raw/orders_invalid.csv"
+
+dbt:
+  project_dir: "dbt_project"
+  profiles_dir: "dbt_project"
+  target: "dev"
+
+reports:
+  behave_html_dir: "reports/behave"  
