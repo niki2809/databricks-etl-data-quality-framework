@@ -57,6 +57,9 @@ def _table_batch(table_name: str):
 
 
 def _summarize(result, label: str) -> dict:
+    errors = _exception_messages(getattr(result, "exception_info", None))
+    if errors:
+        raise AssertionError(f"GX error for '{label}': {'; '.join(errors)}")
     return {
         "passed": bool(result.success),
         "success": bool(result.success),

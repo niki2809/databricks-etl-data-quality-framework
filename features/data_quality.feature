@@ -1,4 +1,4 @@
-Feature: Data Quality Automation
+Feature: Data Quality Checks
   As a data engineering team
   We want an automated data-testing suite covering the full ETL flow
   So that broken pipelines and bad data are caught before they reach downstream application.
