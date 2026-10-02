@@ -12,4 +12,10 @@ def step_not_null(context, table, column):
 def step_check_passes(context):
     r = context.last_check_result
     assert r["passed"], f"{r['label']} failed: {r['result']}"
-    
+
+
+@when('I run a duplicate check on "{table}" using key "{key}"')
+def step_duplicates(context, table, key):
+    context.last_check_result = ge_validations.check_duplicates(table, key)
+
+

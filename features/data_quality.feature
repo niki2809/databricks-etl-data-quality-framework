@@ -21,3 +21,17 @@ Feature: Data Quality Automation
       | stg_customers | email       |
       | stg_orders    | order_id    |
       | stg_orders    | customer_id |
+
+
+@regression @uniqueness
+  Scenario Outline: Primary keys must be unique
+    Given the ETL pipeline has been executed
+    When I run a duplicate check on "<table>" using key "<key>"
+    Then the check should pass
+
+    Examples:
+      | table         | key         |
+      | stg_customers | customer_id |
+      | stg_orders    | order_id    |
+
+
