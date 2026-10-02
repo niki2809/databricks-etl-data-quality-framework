@@ -9,6 +9,7 @@ Feature: Data Quality Automation
     When the ETL pipeline is executed via dbt seed, run and test
     Then the pipeline should complete with no errors
 
+
 @regression @completeness
   Scenario Outline: Key columns must not contain nulls
     Given the ETL pipeline has been executed
@@ -33,5 +34,51 @@ Feature: Data Quality Automation
       | table         | key         |
       | stg_customers | customer_id |
       | stg_orders    | order_id    |
+
+
+@regression @integrity
+  Scenario Outline: Every order must reference an existing customer
+    Given the ETL pipeline has been executed
+    When I run a referential integrity check between "<child>" and "<parent>"
+    Then the check should pass
+
+    Examples:
+      | child                 | parent                 |
+      | stg_orders.customer_id | stg_customers.customer_id |
+
+
+  @regression @business
+  Scenario Outline: Order amounts must never be negative
+    Given the ETL pipeline has been executed
+    When I run a value range check on "<table>" column "<column>" with minimum <minimum>
+    Then the check should pass
+
+    Examples:
+      | table      | column       | minimum |
+      | stg_orders | order_amount | 0       |
+
+
+  @regression @business
+  Scenario Outline: Order status must only contain accepted values
+    Given the ETL pipeline has been executed
+    When I run an accepted values check on "<table>" column "<column>" allowing "<values>"
+    Then the check should pass
+
+
+    Examples:
+      | table      | column       | values                       |
+      | stg_orders | order_status | COMPLETED, CANCELLED, PENDING |
+
+
+  @regression @freshness
+  Scenario Outline: Dates must not be in the future
+    Given the ETL pipeline has been executed
+    When I run a freshness check on "<table>" column "<column>"
+    Then the check should pass
+
+    Examples:
+      | table         | column      |
+      | stg_orders    | order_date  |
+      | stg_customers | signup_date |
 
 
