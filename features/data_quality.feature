@@ -82,3 +82,21 @@ Feature: Data Quality Automation
       | stg_customers | signup_date |
 
 
+@regression @reconciliation
+  Scenario Outline: Row counts must match between layers
+    Given the ETL pipeline has been executed
+    When I compare the row count of "<table>" with "<other_table>"
+    Then the check should pass
+
+    Examples:
+      | table         | other_table   |
+      | stg_customers | raw_customers |
+      | stg_orders    | raw_orders    |
+
+  @regression @reconciliation
+  Scenario: Mart totals must reconcile with the staging layer
+    Given the ETL pipeline has been executed
+    When I reconcile the totals of "customer_order_summary" against "stg_orders"
+    Then the check should pass
+
+

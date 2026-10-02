@@ -40,6 +40,16 @@ def step_freshness(context, table, column):
     context.last_check_result = ge_validations.check_freshness(table, column)
 
 
+@when('I compare the row count of "{table}" with "{other_table}"')
+def step_row_count(context, table, other_table):
+    context.last_check_result = ge_validations.check_row_count_matches(table, other_table)
+
+
+@when('I reconcile the totals of "{mart}" against "{orders}"')
+def step_reconcile(context, mart, orders):
+    context.last_check_result = ge_validations.check_aggregate_reconciliation(mart, orders)
+
+    
 @then("the check should pass")
 def step_check_passes(context):
     r = context.last_check_result

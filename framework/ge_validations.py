@@ -152,3 +152,28 @@ def check_freshness(table: str, date_column: str, max_future_days: int = 0) -> d
         WHERE {date_column} > date_add(current_date(), {max_future_days})
     """
     return check_query(table, f"No future-dated {date_column} in {table}", sql)
+
+
+def check_row_count_matches(table: str, other_table: str) -> dict:
+    batch = _table_batch(table)
+    result = batch.validate(
+        gx.expectations.ExpectTableRowCountToEqualOtherTable(other_table_name=other_table)
+    )
+    return _summarize(result, f"{table} row count == {other_table} row count")
+
+
+def check_aggregate_reconciliation(mart_table: str, orders_table: str, tolerance: float = 0.01) -> dict:
+    sql = f"""
+        SELECT m.customer_id, m.total_spent AS mart_total, o.expected_total
+        FROM {{batch}} m
+        JOIN (
+            SELECT customer_id, SUM(order_amount) AS expected_total
+            FROM {orders_table}
+            WHERE order_status <> 'CANCELLED'
+            GROUP BY customer_id
+        ) o ON o.customer_id = m.customer_id
+        WHERE ABS(m.total_spent - o.expected_total) > {tolerance}
+    """
+    return check_query(mart_table, f"{mart_table}.total_spent reconciles with {orders_table}", sql)
+
+
