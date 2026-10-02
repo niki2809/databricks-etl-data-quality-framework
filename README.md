@@ -25,53 +25,6 @@ behave scenarios  ->  console output + HTML report
 
 dbt tests (`unique`, `not_null`, `relationships`, `accepted_values` and one custom SQL test) act as a quick gate inside the pipeline. GX is the independent validation layer that checks the finished tables and reports results through the behave scenarios.
 
-## Project structure
-
-```
-.
-├── behave.ini                  # behave settings and HTML formatter
-├── requirements.txt            # pinned dependencies
-├── .env.example                # names of the required environment variables
-├── config/
-│   └── config.yaml             # file paths, env var names, dbt settings
-├── data/raw/
-│   └── orders_invalid.csv      # deliberately bad data for the negative scenario
-├── dbt_project/
-│   ├── dbt_project.yml
-│   ├── profiles.yml            # reads credentials from environment variables
-│   ├── seeds/                  # raw_customers.csv, raw_orders.csv
-│   ├── models/staging/         # stg_customers, stg_orders, sources and tests
-│   ├── models/marts/           # customer_order_summary
-│   └── tests/                  # custom SQL test
-├── features/
-│   ├── data_quality.feature    # the BDD scenarios
-│   ├── environment.py          # behave hooks
-│   └── steps/                  # step definitions
-├── framework/
-│   ├── config.py               # config loader
-│   ├── db.py                   # Databricks connection and fixture loader
-│   ├── dbt_runner.py           # runs dbt seed, run and test
-│   └── ge_validations.py       # all Great Expectations checks
-├── reports/behave/             # generated HTML report
-└── docs/screenshots/           # screenshots of test execution
-```
-
-## Test scenarios (18)
-
-| Area | Tag | Scenarios | What is checked | GX approach |
-|---|---|---|---|---|
-| Pipeline | `@smoke` | 1 | dbt seed, run and test complete without errors | dbt |
-| Completeness | `@completeness` | 4 | Key columns contain no nulls | `ExpectColumnValuesToNotBeNull` |
-| Uniqueness | `@uniqueness` | 2 | No duplicate primary keys | SQL via `UnexpectedRowsExpectation` |
-| Referential integrity | `@integrity` | 1 | Every order references an existing customer | SQL via `UnexpectedRowsExpectation` |
-| Business rules | `@business` | 2 | Amounts are not negative, status is an accepted value | `ExpectColumnValuesToBeBetween`, `ExpectColumnValuesToBeInSet` |
-| Freshness | `@freshness` | 2 | No future-dated records | SQL via `UnexpectedRowsExpectation` |
-| Reconciliation | `@reconciliation` | 3 | Row counts match between layers, mart totals match staging | `ExpectTableRowCountToEqualOtherTable`, SQL |
-| Schema | `@schema` | 2 | Expected columns exist with the expected types | `ExpectColumnToExist`, `ExpectColumnValuesToBeInTypeList` |
-| Negative | `@negative` | 1 | Checks detect duplicates, orphans, bad values, invalid status and future dates in a deliberately invalid fixture | all of the above |
-
-The negative scenario loads `data/raw/orders_invalid.csv` into a scratch table (`raw_orders_override`) and asserts that the checks fail on it. This proves the checks catch bad data instead of passing by default.
-
 ## Prerequisites
 
 - Python 3.10 or newer
