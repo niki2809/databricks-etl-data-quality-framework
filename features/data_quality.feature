@@ -113,4 +113,19 @@ Feature: Data Quality Automation
       | stg_orders    |
 
 
-      
+@negative
+  Scenario: The framework detects duplicate, orphaned, invalid and stale records
+    Given the ETL pipeline has been executed
+    And the invalid orders fixture has been loaded into "raw_orders_override"
+    When I run a duplicate check on "raw_orders_override" using key "order_id"
+    Then the check should fail
+    When I run a referential integrity check between "raw_orders_override.customer_id" and "stg_customers.customer_id"
+    Then the check should fail
+    When I run a value range check on "raw_orders_override" column "order_amount" with minimum 0
+    Then the check should fail
+    When I run an accepted values check on "raw_orders_override" column "order_status" allowing "COMPLETED, CANCELLED, PENDING"
+    Then the check should fail
+    When I run a freshness check on "raw_orders_override" column "order_date"
+    Then the check should fail
+
+

@@ -1,6 +1,7 @@
-from behave import when, then
+from behave import given, when, then
 
-from framework import ge_validations
+from framework import db, ge_validations
+from framework.config import load_config, resolve
 
 
 @when('I run a not-null check on "{table}" column "{column}"')
@@ -66,11 +67,23 @@ def step_inspect_schema(context, table):
         "label": f"{table} schema",
         "result": failures,
     }
-    
-        
+
+
 @then("the check should pass")
 def step_check_passes(context):
     r = context.last_check_result
     assert r["passed"], f"{r['label']} failed: {r['result']}"
+
+
+@given('the invalid orders fixture has been loaded into "{table}"')
+def step_load_invalid_fixture(context, table):
+    csv_path = resolve(load_config()["raw_data"]["orders_invalid_csv"])
+    db.load_raw_orders(csv_path, table_name=table)
+
+
+@then("the check should fail")
+def step_check_fails(context):
+    r = context.last_check_result
+    assert not r["passed"], f"Expected '{r['label']}' to detect bad data, but it passed"
 
 
