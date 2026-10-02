@@ -49,7 +49,25 @@ def step_row_count(context, table, other_table):
 def step_reconcile(context, mart, orders):
     context.last_check_result = ge_validations.check_aggregate_reconciliation(mart, orders)
 
+
+@when('I inspect the schema of table "{table}"')
+def step_inspect_schema(context, table):
+    failures = []
+    for column in ge_validations.EXPECTED_TYPES[table]:
+        exists = ge_validations.check_column_exists(table, column)
+        if not exists["passed"]:
+            failures.append({"column": column, "issue": "missing"})
+            continue
+        typed = ge_validations.check_column_type(table, column)
+        if not typed["passed"]:
+            failures.append({"column": column, "issue": "wrong type", "gx_result": typed["result"]})
+    context.last_check_result = {
+        "passed": not failures,
+        "label": f"{table} schema",
+        "result": failures,
+    }
     
+        
 @then("the check should pass")
 def step_check_passes(context):
     r = context.last_check_result

@@ -47,7 +47,7 @@ Feature: Data Quality Automation
       | stg_orders.customer_id | stg_customers.customer_id |
 
 
-  @regression @business
+@regression @business
   Scenario Outline: Order amounts must never be negative
     Given the ETL pipeline has been executed
     When I run a value range check on "<table>" column "<column>" with minimum <minimum>
@@ -58,7 +58,7 @@ Feature: Data Quality Automation
       | stg_orders | order_amount | 0       |
 
 
-  @regression @business
+@regression @business
   Scenario Outline: Order status must only contain accepted values
     Given the ETL pipeline has been executed
     When I run an accepted values check on "<table>" column "<column>" allowing "<values>"
@@ -70,7 +70,7 @@ Feature: Data Quality Automation
       | stg_orders | order_status | COMPLETED, CANCELLED, PENDING |
 
 
-  @regression @freshness
+@regression @freshness
   Scenario Outline: Dates must not be in the future
     Given the ETL pipeline has been executed
     When I run a freshness check on "<table>" column "<column>"
@@ -93,10 +93,24 @@ Feature: Data Quality Automation
       | stg_customers | raw_customers |
       | stg_orders    | raw_orders    |
 
-  @regression @reconciliation
+
+@regression @reconciliation
   Scenario: Mart totals must reconcile with the staging layer
     Given the ETL pipeline has been executed
     When I reconcile the totals of "customer_order_summary" against "stg_orders"
     Then the check should pass
 
 
+@regression @schema
+  Scenario Outline: Staging tables must have the expected schema
+    Given the ETL pipeline has been executed
+    When I inspect the schema of table "<table>"
+    Then the check should pass
+
+    Examples:
+      | table         |
+      | stg_customers |
+      | stg_orders    |
+
+
+      

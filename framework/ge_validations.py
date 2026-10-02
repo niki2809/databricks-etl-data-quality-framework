@@ -177,3 +177,35 @@ def check_aggregate_reconciliation(mart_table: str, orders_table: str, tolerance
     return check_query(mart_table, f"{mart_table}.total_spent reconciles with {orders_table}", sql)
 
 
+EXPECTED_TYPES = {
+    "stg_customers": {
+        "customer_id": ["int", "integer"],
+        "first_name": ["string", "varchar"],
+        "last_name": ["string", "varchar"],
+        "email": ["string", "varchar"],
+        "signup_date": ["date"],
+        "country": ["string", "varchar"],
+    },
+    "stg_orders": {
+        "order_id": ["int", "integer"],
+        "customer_id": ["int", "integer"],
+        "order_date": ["date"],
+        "order_amount": ["double", "float"],
+        "order_status": ["string", "varchar"],
+    },
+}
+
+
+def check_column_exists(table: str, column: str) -> dict:
+    batch = _table_batch(table)
+    result = batch.validate(gx.expectations.ExpectColumnToExist(column=column))
+    return _summarize(result, f"{table}.{column} exists")
+
+
+def check_column_type(table: str, column: str) -> dict:
+    type_list = EXPECTED_TYPES[table][column]
+    batch = _table_batch(table)
+    result = batch.validate(
+        gx.expectations.ExpectColumnValuesToBeInTypeList(column=column, type_list=type_list)
+    )
+    return _summarize(result, f"{table}.{column} type in {type_list}")
