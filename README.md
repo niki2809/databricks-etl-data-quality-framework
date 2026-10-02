@@ -1,4 +1,4 @@
-Databricks ETL Data Quality Framework
+**Databricks ETL Data Quality Framework**
 
 A BDD data-testing framework for a small ETL flow on Databricks validating each layer using Great Expectations (GX).
 
@@ -7,7 +7,7 @@ ETL: dbt seeds two source tables (customers, orders), builds staging views and a
 Data quality: GX checks run directly against the Databricks SQL warehouse.
 Reports: behave HTML report, plus the terminal output and screenshots in docs/screenshots/.
 
-Project Structure
+**Project Structure**
 
 ├── behave.ini                  # behave settings and HTML formatter
 ├── requirements.txt            # pinned dependencies
@@ -36,14 +36,14 @@ Project Structure
 └── docs/screenshots/           # screenshots of test execution
 
 
-Prerequisites
+**Prerequisites**
 
 Python 3.10 or newer
 A Databricks workspace with a running SQL warehouse
 A catalog and schema where you can create tables (defaults: workspace and dq_framework)
 A Databricks personal access token (User Settings, Developer, Access tokens)
 
-Setup
+**Setup**
 
 git clone https://github.com/niki2809/databricks-etl-data-quality-framework.git
 cd databricks-etl-data-quality-framework
@@ -53,16 +53,16 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 
-Create the schema once in the Databricks SQL editor:
+**Create the schema once in the Databricks SQL editor:**
 sql
 CREATE SCHEMA IF NOT EXISTS workspace.dq_framework;
 
 
-Copy .env.example to .env and fill in your values:
+**Copy .env.example to .env and fill in your values:**
 cp .env.example .env
 
 
-Variable	Example
+**Variable	Example**
 DATABRICKS_HOST	dbc-xxxxxxxx-xxxx.cloud.databricks.com (no https://)
 DATABRICKS_HTTP_PATH	/sql/1.0/warehouses/xxxxxxxxxxxxxxxx
 DATABRICKS_TOKEN	dapi...
@@ -70,16 +70,16 @@ DATABRICKS_CATALOG	workspace
 DATABRICKS_SCHEMA	dq_framework
 
 
-Load the variables into your terminal. Environment variables last only for the terminal session, so repeat this in every new terminal:
+**Load the variables into your terminal. Environment variables last only for the terminal session, so repeat this in every new terminal:**
 
 set -a; source .env; set +a
 
-Check the connection before running the tests:
+**Check the connection before running the tests:**
 
 
 dbt debug --project-dir dbt_project --profiles-dir dbt_project
 
-Running the tests
+**Running the tests**
 
 behave                                   # all 18 scenarios
 behave --tags=@smoke                     # pipeline only
@@ -88,7 +88,7 @@ behave --tags=@completeness,@uniqueness  # several groups
 behave --dry-run                         # check all steps are defined, run nothing
 
 
-Generate the HTML report:
+**Generate the HTML report:**
 
 behave -f html -o reports/behave/report.html -f pretty
 open reports/behave/report.html
